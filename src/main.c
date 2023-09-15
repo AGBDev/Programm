@@ -1,3 +1,17 @@
+/*
+Half-Life 3 - A very bad and harmful computer virus. (not really)
+Developed by Nils 'AGBDev' Boehm.
+
+Note: This virus does not actually do anything harmful, due to me being bad at programming in c.
+But I guess I feel better with this project. You know, learning and gaining exp with the C programming language.
+I hope my code is not to poorly written, I'll put in good effort tho. So please dont by to harsh ;)
+
+This is the main file for the project, it checks if we are running on windows and then uses the windows api to draw a window.
+If were not on windows, use the default int main() function and tell the user windows only.
+*/
+
+
+#ifdef _WIN32
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,7 +93,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     HWND hwnd = CreateWindow(
         "MyWindowClass",    // Class name
         "Half-Life 3",        // Window title
-        WS_OVERLAPPEDWINDOW, // Window style
+        WS_OVERLAPPED, // Window style
         CW_USEDEFAULT, CW_USEDEFAULT, // Initial position (x, y)
         1120, 695,            // Initial size (width, height)
         NULL,                // Parent window
@@ -87,11 +101,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         hInstance,           // Instance handle
         NULL                 // Additional application data
     );
-
-    // label01 = CreateWindow(TEXT("Edit"), TEXT("Label"),
-    //              WS_VISIBLE | WS_CHILD,
-    //              20, 10, 280, 25,
-    //              hwnd, (HMENU) 3, NULL, NULL);
 
     HWND button_newgame = CreateWindow(TEXT("button"), TEXT("New Game"),    
                  WS_VISIBLE | WS_CHILD | WS_BORDER,
@@ -140,3 +149,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     return 0;
 }
+#else
+#include <stdio.h>
+int main()
+{
+    puts("Windows only! Press enter to exit.");
+    fgetc(stdin);
+    return 1;
+}
+#endif
+

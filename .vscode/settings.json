@@ -3,6 +3,8 @@
         "stdio.h": "c",
         "rebuilder.h": "c",
         "unistd.h": "c",
-        "*.rh": "c"
+        "*.rh": "c",
+        "util.h": "c",
+        "defines.h": "c"
     }
 }
