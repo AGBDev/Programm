@@ -1,3 +1,0 @@
-C:/Users/agbgi/Desktop/Half Life 3/out/CMakeFiles/hl3.dir
-C:/Users/agbgi/Desktop/Half Life 3/out/CMakeFiles/edit_cache.dir
-C:/Users/agbgi/Desktop/Half Life 3/out/CMakeFiles/rebuild_cache.dir
