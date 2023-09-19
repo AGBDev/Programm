@@ -13,7 +13,6 @@ void remove_from_scp_file_by_name(scpfile_t *file, const char *name)
 {
 }
 
-// TODO: Make so it does work
 scpfile_t *read_scp_file(const char *filename)
 {
     scpfile_t *scp_file = malloc(sizeof(scp_file));
