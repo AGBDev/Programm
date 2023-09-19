@@ -17,6 +17,7 @@ and then uses the windows api to draw a window.
 
 #include "defines.h"
 #include "util.h"
+#include "files.h"
 
 static HWND main_window_handle;
 static HINSTANCE main_window_instane;
@@ -146,8 +147,28 @@ static void handle_menus(WPARAM wParam)
 {
     if (LOWORD(wParam) == MENU_FILE_NEW)
     {
-        MessageBox(main_window_handle, TEXT("Hahaha its just a prank!"), TEXT(WINDOW_HEADER),
-                   2);
+        char filename[MAX_PATH];
+
+        OPENFILENAME ofn;
+        ZeroMemory(&filename, sizeof(filename));
+        ZeroMemory(&ofn, sizeof(ofn));
+        ofn.lStructSize = sizeof(ofn);
+        ofn.hwndOwner = NULL; // If you have a window to center over, put its HANDLE here
+        ofn.lpstrFilter = "Super Cool Program Files\0*.scp\0Any File\0*.*\0";
+        ofn.lpstrFile = filename;
+        ofn.nMaxFile = MAX_PATH;
+        ofn.lpstrTitle = "Select save path.";
+        ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+
+        if (GetSaveFileName(&ofn))
+        {
+            scpfile_t *file = scpfile_generate("Test Daten");
+            scpfile_save(file, filename);
+            free(file);
+            char str[200];
+            sprintf(str, "Saved %s to %s.", file->name, filename);
+            MessageBox(main_window_handle, str, TEXT("Program"), 1);
+        }
     }
     if (LOWORD(wParam) == MENU_FILE_OPEN)
     {
