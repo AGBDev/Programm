@@ -9,17 +9,18 @@ This is the main file for the project, it checks if we are running on windows an
 */
 
 #include <windows.h>
+#include <commctrl.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "defines.h"
-#include "file_formats.h"
 
 static HWND main_window_handle;
 static HINSTANCE main_window_instane;
 static HMENU hMenubar;
 static HMENU hMenuFile;
 static HMENU hMenuInfo;
+static HWND hListView;
 
 // Menu Items
 #define MENU_FILE_NEW 1
@@ -71,11 +72,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 2;
     }
 
-    create_menus();
+    hListView = CreateWindowExW(0, WC_LISTVIEWW, NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_SHOWSELALWAYS | LVS_REPORT, 0, 0, 250, 400, main_window_handle, NULL, NULL, NULL);
 
-    scpfile_t *g = generate_scp_file(2);
-    write_scp_file(g, "test.scp");
-    free(g);
+    
+
+    create_menus();
 
     // Show and update the window
     ShowWindow(main_window_handle, nCmdShow);
@@ -137,20 +138,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             ZeroMemory( &ofn,      sizeof( ofn ) );
             ofn.lStructSize  = sizeof( ofn );
             ofn.hwndOwner    = NULL;  // If you have a window to center over, put its HANDLE here
-            ofn.lpstrFilter  = "Super Cool Program FIles\0*.scp\0Any File\0*.*\0";
+            ofn.lpstrFilter  = "Super Cool Program Files\0*.scp\0Any File\0*.*\0";
             ofn.lpstrFile    = filename;
             ofn.nMaxFile     = MAX_PATH;
-            ofn.lpstrTitle   = "Select a File, yo!";
+            ofn.lpstrTitle   = "Select a file to load.";
             ofn.Flags        = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
   
             if (GetOpenFileNameA( &ofn ))
             {
-                scpfile_t *file = read_scp_file(filename);
-                if (file == NULL)
-                {
-                    MessageBox(hwnd, TEXT("Failed to load file!"), TEXT(WINDOW_HEADER), 2);
-                }
-                free(file);
             }
         }
         if (LOWORD(wParam) == MENU_FILE_OPTIONS)
