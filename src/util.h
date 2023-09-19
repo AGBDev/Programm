@@ -1,7 +1,7 @@
 #ifndef __UTIL_H__
-#define __UTIL_H_
+#define __UTIL_H__
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #endif //__UTIL_H_

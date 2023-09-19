@@ -1,11 +1,13 @@
 /*
 Developed by Nils 'AGBDev' Boehm.
 
-Note: This virus does not actually do anything harmful, due to me being bad at programming in c.
-But I guess I feel better with this project. You know, learning and gaining exp with the C programming language.
-I hope my code is not to poorly written, I'll put in good effort tho. So please dont by too harsh ;)
+Note: This virus does not actually do anything harmful, due to me being bad at
+programming in c. But I guess I feel better with this project. You know,
+learning and gaining exp with the C programming language. I hope my code is not
+to poorly written, I'll put in good effort tho. So please dont by too harsh ;)
 
-This is the main file for the project, it checks if we are running on windows and then uses the windows api to draw a window.
+This is the main file for the project, it checks if we are running on windows
+and then uses the windows api to draw a window.
 */
 
 #include <Windows.h>
@@ -14,6 +16,7 @@ This is the main file for the project, it checks if we are running on windows an
 #include <stdlib.h>
 
 #include "defines.h"
+#include "util.h"
 
 static HWND main_window_handle;
 static HINSTANCE main_window_instane;
@@ -32,10 +35,12 @@ static HWND hListView;
 // Window procedure (callback) to handle messages for our window
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-// Create and draw menubar and its items
+// menu code
 static void create_menus();
+static void handle_menus(WPARAM wParam);
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                   LPSTR lpCmdLine, int nCmdShow)
 {
     // Define the window class
     WNDCLASS wc = {0};
@@ -54,17 +59,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 1;
 
     // Create the window
-    main_window_handle = CreateWindow(
-        "MyWindowClass",    // Class name
-        WINDOW_HEADER,        // Window title
-        WS_OVERLAPPEDWINDOW, // Window style
-        CW_USEDEFAULT, CW_USEDEFAULT, // Initial position (x, y)
-        SCREEN_WIDTH, SCREEN_HEIGHT,            // Initial size (width, height)
-        NULL,                // Parent window
-        NULL,                // Menu
-        hInstance,           // Instance handle
-        NULL                 // Additional application data
-    );
+    main_window_handle =
+        CreateWindow("MyWindowClass",              // Class name
+                WINDOW_HEADER,                // Window title
+                WS_OVERLAPPEDWINDOW,          // Window style
+                CW_USEDEFAULT, CW_USEDEFAULT, // Initial position (x, y)
+                SCREEN_WIDTH, SCREEN_HEIGHT,  // Initial size (width, height)
+                NULL,                         // Parent window
+                NULL,                         // Menu
+                hInstance,                    // Instance handle
+                NULL                          // Additional application data
+        );
 
     if (!main_window_handle)
     {
@@ -72,7 +77,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 2;
     }
 
-    hListView = CreateWindowExW(0, WC_LISTVIEWW, L"Hallo", WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_SHOWSELALWAYS | LVS_REPORT, 0, 0, 250, 400, main_window_handle, NULL, NULL, NULL);
+    hListView = CreateWindowExW(
+        0, WC_LISTVIEWW, L"Hallo",
+        WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_SHOWSELALWAYS | LVS_REPORT, 0, 0,
+        250, 400, main_window_handle, NULL, NULL, NULL);
 
     create_menus();
 
@@ -91,7 +99,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     return 0;
 }
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+
+
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+                            LPARAM lParam)
 {
     switch (uMsg)
     {
@@ -101,47 +112,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0); // Post a quit message to exit the application
         break;
     case WM_COMMAND:
-        if (LOWORD(wParam) == MENU_FILE_NEW)
-        {
-            MessageBox(hwnd, TEXT("Hahaha its just a prank!"), TEXT(WINDOW_HEADER), 2);
-        }
-        if (LOWORD(wParam) == MENU_FILE_OPEN)
-        {
-            char filename[ MAX_PATH ];
-
-            OPENFILENAME ofn;
-            ZeroMemory( &filename, sizeof( filename ) );
-            ZeroMemory( &ofn,      sizeof( ofn ) );
-            ofn.lStructSize  = sizeof( ofn );
-            ofn.hwndOwner    = NULL;  // If you have a window to center over, put its HANDLE here
-            ofn.lpstrFilter  = "Super Cool Program Files\0*.scp\0Any File\0*.*\0";
-            ofn.lpstrFile    = filename;
-            ofn.nMaxFile     = MAX_PATH;
-            ofn.lpstrTitle   = "Select a file to load.";
-            ofn.Flags        = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
-  
-            if (GetOpenFileNameA( &ofn ))
-            {
-            }
-        }
-        if (LOWORD(wParam) == MENU_FILE_OPTIONS)
-        {
-            
-        }
-        if (LOWORD(wParam) == MENU_FILE_QUIT)
-        {
-            PostQuitMessage(0);
-        }
-        if (LOWORD(wParam) == MENU_INFO_ABOUT)
-        {
-            MessageBox(hwnd, TEXT(WINDOW_HEADER), TEXT(WINDOW_HEADER), 2);
-        }
+        handle_menus(wParam);
         break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
     return 0;
 }
+
+
 
 static void create_menus()
 {
@@ -161,4 +140,44 @@ static void create_menus()
 
     SetMenu(main_window_handle, hMenubar);
     DrawMenuBar(main_window_handle);
+}
+
+static void handle_menus(WPARAM wParam)
+{
+    if (LOWORD(wParam) == MENU_FILE_NEW)
+    {
+        MessageBox(main_window_handle, TEXT("Hahaha its just a prank!"), TEXT(WINDOW_HEADER),
+                   2);
+    }
+    if (LOWORD(wParam) == MENU_FILE_OPEN)
+    {
+        char filename[MAX_PATH];
+
+        OPENFILENAME ofn;
+        ZeroMemory(&filename, sizeof(filename));
+        ZeroMemory(&ofn, sizeof(ofn));
+        ofn.lStructSize = sizeof(ofn);
+        ofn.hwndOwner = NULL; // If you have a window to center over, put its HANDLE here
+        ofn.lpstrFilter = "Super Cool Program Files\0*.scp\0Any File\0*.*\0";
+        ofn.lpstrFile = filename;
+        ofn.nMaxFile = MAX_PATH;
+        ofn.lpstrTitle = "Select a file to load.";
+        ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+
+        if (GetOpenFileNameA(&ofn))
+        {
+            MessageBox(main_window_handle, TEXT("Vergessen zu implementieren \\_(*_*)_/"), TEXT("Test"), MB_ABORTRETRYIGNORE);
+        }
+    }
+    if (LOWORD(wParam) == MENU_FILE_OPTIONS)
+    {
+    }
+    if (LOWORD(wParam) == MENU_FILE_QUIT)
+    {
+        PostQuitMessage(0);
+    }
+    if (LOWORD(wParam) == MENU_INFO_ABOUT)
+    {
+        MessageBox(main_window_handle, TEXT(WINDOW_HEADER), TEXT(WINDOW_HEADER), 2);
+    }
 }
