@@ -13,7 +13,6 @@ This is the main file for the project, it checks if we are running on windows an
 #include <stdlib.h>
 
 #include "defines.h"
-#include "rebuilder.h"
 #include "file_formats.h"
 
 static HWND main_window_handle;

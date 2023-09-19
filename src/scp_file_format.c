@@ -1,6 +1,7 @@
 #include "file_formats.h"
 #include "defines.h"
 
+//TODO: Make so it does work
 scpfile_t *read_scp_file(const char *filename)
 {
     scpfile_t *scp_file = malloc(sizeof(scp_file));
@@ -38,5 +39,8 @@ scpfile_t *read_scp_file(const char *filename)
 
 size_t write_scp_file(const scpfile_t* scp_file)
 {
-
+    if (scp_file == NULL)
+    {
+        return 0;
+    }
 }
