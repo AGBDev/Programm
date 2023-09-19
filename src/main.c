@@ -8,7 +8,7 @@ I hope my code is not to poorly written, I'll put in good effort tho. So please 
 This is the main file for the project, it checks if we are running on windows and then uses the windows api to draw a window.
 */
 
-#include <windows.h>
+#include <Windows.h>
 #include <commctrl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,9 +72,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 2;
     }
 
-    hListView = CreateWindowExW(0, WC_LISTVIEWW, NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_SHOWSELALWAYS | LVS_REPORT, 0, 0, 250, 400, main_window_handle, NULL, NULL, NULL);
-
-    
+    hListView = CreateWindowExW(0, WC_LISTVIEWW, L"Hallo", WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_SHOWSELALWAYS | LVS_REPORT, 0, 0, 250, 400, main_window_handle, NULL, NULL, NULL);
 
     create_menus();
 
@@ -97,29 +95,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
-    case WM_PAINT:
-        HBITMAP hBitmap01 = NULL;
-        PAINTSTRUCT     ps01;
-        HDC             hdc01;
-        BITMAP          bitmap01;
-        HDC             hdcMem01;
-        HGDIOBJ         oldBitmap01;
-
-        hdc01 = BeginPaint(hwnd, &ps01);
-
-        hdcMem01 = CreateCompatibleDC(hdc01);
-        oldBitmap01 = SelectObject(hdcMem01, hBitmap01);
-
-        GetObject(hBitmap01, sizeof(bitmap01), &bitmap01);
-        BitBlt(hdc01, 0, 0, bitmap01.bmWidth, bitmap01.bmHeight, hdcMem01, 0, 0, SRCCOPY);
-
-        SelectObject(hdcMem01, oldBitmap01);
-        DeleteDC(hdcMem01);
-
-        EndPaint(hwnd, &ps01);
-        break;
     case WM_CREATE:
-        hBitmap01 = (HBITMAP)LoadImage(NULL, "red.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
         break;
     case WM_CLOSE:
         PostQuitMessage(0); // Post a quit message to exit the application
