@@ -4,6 +4,4 @@
 #include <string.h>
 #include <stdio.h>
 
-unsigned short file_exists(const char* filename);
-
 #endif //__UTIL_H_

@@ -1,7 +1,7 @@
 #include <string.h>
 
-#include "include/defines.h"
-#include "include/rebuilder.h"
+#include "defines.h"
+#include "rebuilder.h"
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -10,8 +10,8 @@ typedef rebuilder_file_t rebfile_t;
 unsigned short rebuild_game(HWND hwnd)
 {
 
-    mkdir("halflife3");
-    const char *content_dir = "halflife3/content";
+    mkdir("data");
+    const char *content_dir = "data/content";
     mkdir(content_dir);
 
     char *log = malloc(sizeof(char) * 500);
@@ -22,7 +22,7 @@ unsigned short rebuild_game(HWND hwnd)
     strncpy_s(log, sizeof(char) * 500, "", 1);
 
     rebfile_t game_dat;
-    game_dat.filename = "halflife3/content/game.common.gdat";
+    game_dat.filename = "data/content/common.cres";
 
     if (build_file(game_dat, hwnd) == 0)
     {
@@ -32,7 +32,7 @@ unsigned short rebuild_game(HWND hwnd)
     strncat_s(log, sizeof(char) * 500, game_dat.filename, 500 - strlen(log));
 
     rebfile_t game_anims;
-    game_anims.filename = "halflife3/content/game.anims.gdat";
+    game_anims.filename = "data/content/anims.cres";
 
     if (build_file(game_anims, hwnd) == 0)
     {
@@ -42,7 +42,7 @@ unsigned short rebuild_game(HWND hwnd)
     strncat_s(log, sizeof(char) * 500, game_anims.filename, 500 - strlen(log));
 
     rebfile_t game_levels;
-    game_levels.filename = "halflife3/content/game.lvls.gdat";
+    game_levels.filename = "data/content/windows.cres";
 
     if (build_file(game_levels, hwnd) == 0)
     {
@@ -51,13 +51,18 @@ unsigned short rebuild_game(HWND hwnd)
 
     strncat_s(log, sizeof(char) * 500, game_levels.filename, 500 - strlen(log));
 
+    // handled differently
     rebfile_t game_info;
-    game_info.filename = "hl3.gaminfo";
+    game_info.filename = "prog.inf";
 
-    if (build_file(game_info, hwnd) == 0)
+    FILE *fp_;
+    fopen_s(&fp_, game_info.filename, "w");
+    if (fp_ == NULL)
     {
         MessageBox(hwnd, "Error rebuilding!", MESSAGEBOX_TITLE, 0);
     }
+    fprintf_s(fp_, "version=%s", WINDOW_HEADER);
+    fclose(fp_);
 
     strncat_s(log, sizeof(char) * 500, game_info.filename, 500 - strlen(log));
 
