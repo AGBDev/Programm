@@ -31,6 +31,7 @@ static HMENU hMenuInfo;
 // Window procedure (callback) to handle messages for our window
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+// Create and draw menubar and its items
 static void create_menus();
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -71,6 +72,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     create_menus();
+
+    scpfile_t *g = generate_scp_file(2);
+    write_scp_file(g, "test.scp");
+    free(g);
 
     // Show and update the window
     ShowWindow(main_window_handle, nCmdShow);
@@ -166,7 +171,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
-
 
 static void create_menus()
 {
