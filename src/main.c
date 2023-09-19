@@ -77,18 +77,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(main_window_handle, nCmdShow);
     UpdateWindow(main_window_handle);
 
-    FILE *fp;
-    if ((fp = fopen("prog.inf", "r")) == NULL)
-    {
-        const short result = (short)MessageBox(main_window_handle, "Programm resources not found, rebuild?.", MESSAGEBOX_TITLE, 3);
-        if (result == IDYES)
-        {
-            rebuild_game(main_window_handle);
-            return 0;
-        }
-    }
-    fclose(fp);
-
     // Message loop
     MSG msg = {0};
     while (GetMessage(&msg, NULL, 0, 0))
