@@ -29,6 +29,9 @@ static HWND hListView;
 
 static scpfile_t *current_file;
 
+static HWND current_dialog;
+static char *current_dialog_out;
+
 // Menu Items
 #define MENU_FILE_NEW 1
 #define MENU_FILE_OPEN 2
@@ -39,6 +42,7 @@ static scpfile_t *current_file;
 #define MENU_ENTRY_ADD 5
 #define MENU_ENTRY_REMOVE 6
 #define MENU_INFO_ABOUT 300
+#define DIALOG_KEY_ADD 43
 
 // menu code
 static void create_menus();
@@ -53,8 +57,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 // dialog bs
 LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-void display_dialog(char *out, HWND handle);
-void register_dialog(HWND handle);
+static void display_dialog(char *out, HWND handle);
+static void register_dialog(HWND handle);
 
 
 
@@ -256,8 +260,12 @@ static void handle_menus(WPARAM wParam)
             MessageBox(main_window_handle, TEXT("Please open a file."), TEXT(WINDOW_HEADER), MB_OK | MB_ICONERROR);
             return;
         }
-        char str[200];
-        display_dialog(str, main_window_handle);
+        char str[600];
+        display_dialog(current_dialog_out, main_window_handle);
+        if (strcmp(current_dialog_out, "") == 0)
+        {
+            MessageBox(main_window_handle, TEXT("Error getting info."), TEXT(WINDOW_HEADER), 2);
+        }
         update_lists();
     }
     if (LOWORD(wParam) == MENU_INFO_ABOUT)
@@ -364,24 +372,65 @@ LRESULT DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case WM_CLOSE:
             DestroyWindow(hwnd);
             break;
+        case WM_COMMAND:
+            if (LOWORD(wParam) == DIALOG_KEY_ADD)
+            {
+                if (current_dialog == NULL) return 0;
+
+                char *f = strdup(current_dialog_out);
+                const char *name = strtok(f, "|");
+                const char *value = strtok(NULL, "|");
+                scpfile_add(current_file, name, atoi(value));
+                update_lists();
+            }
+            break;
         default:
             return DefWindowProcW(hwnd, uMsg, wParam, lParam);
     }
     return 0;
 }
 
-void display_dialog(char *out, HWND handle)
+static void display_dialog(char *out, HWND handle)
 {
     HWND dialog = CreateWindowW(L"progDialogClass", L"Dialog", WS_VISIBLE | WS_OVERLAPPEDWINDOW, 400, 400, 200, 200, handle, NULL, NULL, NULL);
 
-    CreateWindowW(L"Button", L"Ok", WS_VISIBLE | WS_CHILD, 20, 80, 50, 40,
-        dialog, (HMENU)1, NULL, NULL);
+    current_dialog = dialog;
 
-    CreateWindowW(L"Text", L"Keyname", WS_VISIBLE | WS_CHILD, 20, 20, 50, 40,
+
+    CreateWindowW(L"Static", L"Keyname", WS_VISIBLE | WS_CHILD, 20, 20, 90, 40,
                   dialog, (HMENU)1, NULL, NULL);
+
+    HWND keyname = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD, 20, 40, 90, 20,
+                  dialog, (HMENU)1, NULL, NULL);
+
+    CreateWindowW(L"Static", L"Keyvalue", WS_VISIBLE | WS_CHILD, 20, 70, 90, 40,
+                  dialog, (HMENU)1, NULL, NULL);
+
+    HWND keyvalue = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD, 20, 90, 90, 20,
+                  dialog, (HMENU)1, NULL, NULL);
+                  
+    CreateWindowW(L"Button", L"Ok", WS_VISIBLE | WS_CHILD, 20, 110, 40, 40,
+        dialog, (HMENU)DIALOG_KEY_ADD, NULL, NULL);
+
+    int cTxtLen = GetWindowTextLengthW(keyname);
+    PSTR pszMem = (PSTR)VirtualAlloc((LPVOID)NULL,
+                                    (DWORD)(cTxtLen + 1), MEM_COMMIT,
+                                    PAGE_READWRITE);
+    GetWindowText(keyname, pszMem, cTxtLen);
+    PSTR pszMem2 = (PSTR)VirtualAlloc((LPVOID)NULL,
+                                     (DWORD)(cTxtLen + 1), MEM_COMMIT,
+                                     PAGE_READWRITE);
+    GetWindowText(keyvalue, pszMem2, cTxtLen);
+    char ret[600];
+
+    sprintf_s(ret, 600, "%s|%s", pszMem, pszMem2);
+
+    current_dialog_out = ret;
+
+    out = strdup(ret);
 }
 
-void register_dialog(HWND handle)
+static void register_dialog(HWND handle)
 {
     WNDCLASSW dialog = {0};
 
