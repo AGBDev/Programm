@@ -317,19 +317,19 @@ void update_lists()
             MessageBox(main_window_handle, TEXT("Error inserting item!"), TEXT("Program"), MB_ICONERROR | MB_OK);
         }
 
-        LV_ITEM value;
-        memset(&value, 0, sizeof(LV_ITEM)); // Initialize the structure to zero.
-        value.mask = LVIF_TEXT;             // Specify that you want to set text.
-        value.iItem = i;                    // Set the item index (assuming you're using a loop).
-        value.iSubItem = 1;                 // Set the subitem index for the second column.
-        value.pszText = TEXT("sex");        // Assign the text from your data.
+        // LV_ITEM value;
+        // memset(&value, 0, sizeof(LV_ITEM)); // Initialize the structure to zero.
+        // value.mask = LVIF_TEXT;             // Specify that you want to set text.
+        // value.iItem = i;                    // Set the item index (assuming you're using a loop).
+        // value.iSubItem = 1;                 // Set the subitem index for the second column.
+        // value.pszText = TEXT("sex");        // Assign the text from your data.
 
-        int res_ = ListView_InsertItem(hListView, &value);
+        // int res_ = ListView_InsertItem(hListView, &value);
 
-        if (res_ == -1)
-        {
-            MessageBox(main_window_handle, TEXT("Error inserting item!"), TEXT("Program"), MB_ICONERROR | MB_OK);
-        }
+        // if (res_ == -1)
+        // {
+        //     MessageBox(main_window_handle, TEXT("Error inserting item!"), TEXT("Program"), MB_ICONERROR | MB_OK);
+        // }
     }
 }
 
