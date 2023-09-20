@@ -169,7 +169,7 @@ static void handle_menus(WPARAM wParam)
             sprintf(str, "Saved %d entries to %s.", file->size, filename);
             MessageBox(main_window_handle, str, TEXT("Program"), 1);
             current_file = file;
-            // update_lists();
+            update_lists();
         }
     }
     if (LOWORD(wParam) == MENU_FILE_OPEN)
@@ -291,8 +291,6 @@ void update_lists()
     {
         ListView_DeleteAllItems(hListView);
     }
-
-    scpfile_add(current_file, "test3", 23);
 
     for (size_t i = 0; i < current_file->size; i++)
     {
