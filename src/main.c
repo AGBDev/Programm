@@ -51,8 +51,16 @@ static void update_lists();
 // Window procedure (callback) to handle messages for our window
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+// dialog bs
+LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+void display_dialog(char *out, HWND handle);
+void register_dialog(HWND handle);
+
+
+
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine, int nCmdShow)
+                       LPSTR lpCmdLine, int nCmdShow)
 {
     // Define the window class
     WNDCLASS wc = {0};
@@ -108,8 +116,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 }
 
 
-// Handlers and Creation functions
 
+
+// Handlers and Creation functions
 
 static void create_menus()
 {
@@ -247,6 +256,8 @@ static void handle_menus(WPARAM wParam)
             MessageBox(main_window_handle, TEXT("Please open a file."), TEXT(WINDOW_HEADER), MB_OK | MB_ICONERROR);
             return;
         }
+        char str[200];
+        display_dialog(str, main_window_handle);
         update_lists();
     }
     if (LOWORD(wParam) == MENU_INFO_ABOUT)
@@ -331,7 +342,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
     switch (uMsg)
     {
     case WM_CREATE:
-
+        register_dialog(main_window_handle);
         break;
     case WM_CLOSE:
         free(current_file);
@@ -344,4 +355,41 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
     return 0;
+}
+
+LRESULT DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch(uMsg)
+    {
+        case WM_CLOSE:
+            DestroyWindow(hwnd);
+            break;
+        default:
+            return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+
+void display_dialog(char *out, HWND handle)
+{
+    HWND dialog = CreateWindowW(L"progDialogClass", L"Dialog", WS_VISIBLE | WS_OVERLAPPEDWINDOW, 400, 400, 200, 200, handle, NULL, NULL, NULL);
+
+    CreateWindowW(L"Button", L"Ok", WS_VISIBLE | WS_CHILD, 20, 80, 50, 40,
+        dialog, (HMENU)1, NULL, NULL);
+
+    CreateWindowW(L"Text", L"Keyname", WS_VISIBLE | WS_CHILD, 20, 20, 50, 40,
+                  dialog, (HMENU)1, NULL, NULL);
+}
+
+void register_dialog(HWND handle)
+{
+    WNDCLASSW dialog = {0};
+
+    dialog.hbrBackground = (HBRUSH)COLOR_WINDOW;
+    dialog.hCursor = LoadCursor(NULL, IDC_CROSS);
+    dialog.hInstance = main_window_instane;
+    dialog.lpszClassName = L"progDialogClass";
+    dialog.lpfnWndProc = DialogProc;
+
+    RegisterClassW(&dialog);
 }
