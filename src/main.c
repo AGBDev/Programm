@@ -17,7 +17,7 @@ and then uses the windows api to draw a window.
 
 #include "defines.h"
 #include "util.h"
-#include "files.h"
+#include "files/files.h"
 
 static HWND main_window_handle;
 static HINSTANCE main_window_instane;
