@@ -34,7 +34,7 @@ void scpfile_add(scpfile_t *scpfile, const char *name, size_t value)
     // Assign the new key-value pair
     scpfile->key_names = new_key_names;
     scpfile->key_values = new_key_values;
-    scpfile->key_names[scpfile->size] = strdup(name); // Make a copy of the name
+    scpfile->key_names[scpfile->size] = _strdup(name); // Make a copy of the name
     scpfile->key_values[scpfile->size] = value;
     scpfile->size++;
 }

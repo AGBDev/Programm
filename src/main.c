@@ -18,7 +18,7 @@ and then uses the windows api to draw a window.
 
 #include "defines.h"
 #include "util.h"
-#include "files/files.h">
+#include "files/files.h"
 
 static HWND main_window_handle;
 static HINSTANCE main_window_instane;
@@ -265,7 +265,7 @@ static void handle_menus(WPARAM wParam)
     }
     if (LOWORD(wParam) == MENU_INFO_ABOUT)
     {
-        MessageBox(main_window_handle, TEXT(WINDOW_HEADER), TEXT(WINDOW_HEADER), 2);
+        MessageBox(main_window_handle, TEXT("Program made by Nils 'AGBDev' Böhm."), TEXT(WINDOW_HEADER), 2);
     }
 }
 
