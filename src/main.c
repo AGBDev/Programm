@@ -14,10 +14,11 @@ and then uses the windows api to draw a window.
 #include <commctrl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <winnt.h>
 
 #include "defines.h"
 #include "util.h"
-#include "files/files.h"
+#include "files/files.h">
 
 static HWND main_window_handle;
 static HINSTANCE main_window_instane;
@@ -26,11 +27,6 @@ static HMENU hMenuFile;
 static HMENU hMenuEntry;
 static HMENU hMenuInfo;
 static HWND hListView;
-
-static scpfile_t *current_file;
-
-static HWND current_dialog;
-static char *current_dialog_out;
 
 // Menu Items
 #define MENU_FILE_NEW 1
@@ -44,9 +40,11 @@ static char *current_dialog_out;
 #define MENU_INFO_ABOUT 300
 #define DIALOG_KEY_ADD 43
 
-// menu code
 static void create_menus();
 static void handle_menus(WPARAM wParam);
+
+// File handle
+static scpfile_t *current_file;
 
 // list
 static void create_lists();
@@ -56,12 +54,12 @@ static void update_lists();
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 // dialog bs
+static HWND current_dialog;
+static char *current_dialog_out;
+
 LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-static void display_dialog(char *out, HWND handle);
+static char* display_dialog(char *out, HWND handle);
 static void register_dialog(HWND handle);
-
-
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                        LPSTR lpCmdLine, int nCmdShow)
@@ -85,14 +83,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     // Create the window
     main_window_handle =
         CreateWindow("MyWindowClass",              // Class name
-                     WINDOW_HEADER,                // Window title
-                     WS_OVERLAPPEDWINDOW,          // Window style
-                     CW_USEDEFAULT, CW_USEDEFAULT, // Initial position (x, y)
-                     SCREEN_WIDTH, SCREEN_HEIGHT,  // Initial size (width, height)
-                     NULL,                         // Parent window
-                     NULL,                         // Menu
-                     hInstance,                    // Instance handle
-                     NULL                          // Additional application data
+        WINDOW_HEADER,                // Window title
+        WS_OVERLAPPEDWINDOW,          // Window style
+        CW_USEDEFAULT, CW_USEDEFAULT, // Initial position (x, y)
+        SCREEN_WIDTH, SCREEN_HEIGHT,  // Initial size (width, height)
+        NULL,                         // Parent window
+        NULL,                         // Menu
+        hInstance,                    // Instance handle
+        NULL                          // Additional application data
         );
 
     if (!main_window_handle)
@@ -118,9 +116,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     return 0;
 }
-
-
-
 
 // Handlers and Creation functions
 
@@ -390,7 +385,7 @@ LRESULT DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-static void display_dialog(char *out, HWND handle)
+static char* display_dialog(char *out, HWND handle)
 {
     HWND dialog = CreateWindowW(L"progDialogClass", L"Dialog", WS_VISIBLE | WS_OVERLAPPEDWINDOW, 400, 400, 200, 200, handle, NULL, NULL, NULL);
 
@@ -425,9 +420,12 @@ static void display_dialog(char *out, HWND handle)
 
     sprintf_s(ret, 600, "%s|%s", pszMem, pszMem2);
 
-    current_dialog_out = ret;
 
-    out = strdup(ret);
+    out = _strdup(ret);
+
+    current_dialog_out = out;
+
+    return out;
 }
 
 static void register_dialog(HWND handle)

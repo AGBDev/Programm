@@ -9,4 +9,4 @@
 
 #define WINDOW_HEADER "Programm | v1.0"
 
-#endif 
+#endif // DEFINES_H__

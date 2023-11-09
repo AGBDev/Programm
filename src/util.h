@@ -4,4 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef void* pointer;
+
 #endif //__UTIL_H_
