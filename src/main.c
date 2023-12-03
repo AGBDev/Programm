@@ -15,9 +15,10 @@ and then uses the windows api to draw a window.
 #include <stdio.h>
 #include <stdlib.h>
 #include <winnt.h>
+#include <winuser.h>
 
-#include "defines.h"
-#include "util.h"
+#include "common/defines.h"
+#include "common/util.h"
 #include "files/files.h"
 
 static HWND main_window_handle;
@@ -28,7 +29,7 @@ static HMENU hMenuEntry;
 static HMENU hMenuInfo;
 static HWND hListView;
 
-// Menu Items
+// Menu Item IDs
 #define MENU_FILE_NEW 1
 #define MENU_FILE_OPEN 2
 #define MENU_FILE_SAVE 21
@@ -44,7 +45,7 @@ static void create_menus();
 static void handle_menus(WPARAM wParam);
 
 // File handle
-static scpfile_t *current_file;
+static scpfile_t *pointer_to_current_file;
 
 // list
 static void create_lists();
@@ -165,7 +166,7 @@ static void handle_menus(WPARAM wParam)
 
         if (GetSaveFileName(&ofn))
         {
-            scpfile_t *file = scpfile_generate("Test Daten");
+            scpfile_t *file = scpfile_generate();
             if (file == NULL)
             {
                 MessageBox(main_window_handle, TEXT("Error preparing save!"), TEXT("Program"), 1);
@@ -174,9 +175,9 @@ static void handle_menus(WPARAM wParam)
             scpfile_add(file, "test", 23);
             scpfile_save(file, filename);
             char str[200];
-            sprintf(str, "Saved %d entries to %s.", file->size, filename);
+            sprintf(str, "Saved %lld entries to %s.", file->size, filename);
             MessageBox(main_window_handle, str, TEXT("Program"), 1);
-            current_file = file;
+            pointer_to_current_file = file;
             update_lists();
         }
     }
@@ -204,9 +205,9 @@ static void handle_menus(WPARAM wParam)
                 return;
             }
             char str[200];
-            sprintf(str, "Loaded %d entries from %s.", file->size, filename);
+            sprintf(str, "Loaded %lld entries from %s.", file->size, filename);
             MessageBox(main_window_handle, str, TEXT("Program"), 1);
-            current_file = file;
+            pointer_to_current_file = file;
             update_lists();
         }
     }
@@ -216,7 +217,7 @@ static void handle_menus(WPARAM wParam)
     }
     if (LOWORD(wParam) == MENU_FILE_SAVEAS)
     {
-        if (current_file == NULL)
+        if (pointer_to_current_file == NULL)
         {
             MessageBox(main_window_handle, TEXT("Please open a file."), TEXT(WINDOW_HEADER), MB_OK | MB_ICONERROR);
             return;
@@ -236,7 +237,7 @@ static void handle_menus(WPARAM wParam)
 
         if (GetSaveFileName(&ofn))
         {
-            scpfile_save(current_file, filename);
+            scpfile_save(pointer_to_current_file, filename);
             update_lists();
         }
     }
@@ -245,12 +246,12 @@ static void handle_menus(WPARAM wParam)
     }
     if (LOWORD(wParam) == MENU_FILE_QUIT)
     {
-        free(current_file);
+        free(pointer_to_current_file);
         PostQuitMessage(0);
     }
     if (LOWORD(wParam) == MENU_ENTRY_ADD)
     {
-        if (current_file == NULL)
+        if (pointer_to_current_file == NULL)
         {
             MessageBox(main_window_handle, TEXT("Please open a file."), TEXT(WINDOW_HEADER), MB_OK | MB_ICONERROR);
             return;
@@ -265,7 +266,7 @@ static void handle_menus(WPARAM wParam)
     }
     if (LOWORD(wParam) == MENU_INFO_ABOUT)
     {
-        MessageBox(main_window_handle, TEXT("Program made by Nils 'AGBDev' Böhm."), TEXT(WINDOW_HEADER), 2);
+        MessageBox(main_window_handle, TEXT("Program made by Nils 'AGBDev' Boehm."), TEXT(WINDOW_HEADER), 2);
     }
 }
 
@@ -299,40 +300,40 @@ void create_lists()
 
 void update_lists()
 {
-    if (current_file == NULL) return;
+    if (pointer_to_current_file == NULL) return;
 
-    for (size_t i = 0; i < current_file->size; i++)
+    for (size_t i = 0; i < pointer_to_current_file->size; i++)
     {
         ListView_DeleteAllItems(hListView);
     }
 
-    for (size_t i = 0; i < current_file->size; i++)
+    for (size_t i = 0; i < pointer_to_current_file->size; i++)
     {
         LV_ITEM name;
         memset(&name, 0, sizeof(LV_ITEM)); // Initialize the structure to zero.
         name.mask = LVIF_TEXT;             // Specify that you want to set text.
         name.iItem = i;                    // Set the name index (assuming you're using a loop).
         name.iSubItem = 0;                 // Set the subitem index.
-        name.pszText = current_file->key_names[i]; // Assign the text from your data.
-        int res = ListView_InsertItem(hListView, &name);
+        name.pszText = pointer_to_current_file->key_names[i]; // Assign the text from your data.
+        const short res = (short)ListView_InsertItem(hListView, &name);
         if (res == -1)
         {
-            MessageBox(main_window_handle, TEXT("Error inserting item!"), TEXT("Program"), MB_ICONERROR | MB_OK);
+            MessageBox(main_window_handle, TEXT("Error inserting item!"), TEXT(WINDOW_HEADER), MB_ICONERROR | MB_OK);
         }
 
-        // LV_ITEM value;
-        // memset(&value, 0, sizeof(LV_ITEM)); // Initialize the structure to zero.
-        // value.mask = LVIF_TEXT;             // Specify that you want to set text.
-        // value.iItem = i;                    // Set the item index (assuming you're using a loop).
-        // value.iSubItem = 1;                 // Set the subitem index for the second column.
-        // value.pszText = TEXT("sex");        // Assign the text from your data.
+        LV_ITEM value;
+        memset(&value, 0, sizeof(LV_ITEM)); // Initialize the structure to zero.
+        value.mask = LVIF_TEXT;             // Specify that you want to set text.
+        value.iItem = i;                    // Set the item index (assuming you're using a loop).
+        value.iSubItem = 1;                 // Set the subitem index for the second column.
+        value.pszText = TEXT("sex");        // Assign the text from your data.
 
-        // int res_ = ListView_InsertItem(hListView, &value);
+        const short res_ = (short)ListView_InsertItem(hListView, &value);
 
-        // if (res_ == -1)
-        // {
-        //     MessageBox(main_window_handle, TEXT("Error inserting item!"), TEXT("Program"), MB_ICONERROR | MB_OK);
-        // }
+        if (res_ == -1)
+        {
+            MessageBox(main_window_handle, TEXT("Error inserting item!"), TEXT(WINDOW_HEADER), MB_ICONERROR | MB_OK);
+        }
     }
 }
 
@@ -348,7 +349,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
         register_dialog(main_window_handle);
         break;
     case WM_CLOSE:
-        free(current_file);
+        free(pointer_to_current_file);
         PostQuitMessage(0); // Post a quit message to exit the application
         break;
     case WM_COMMAND:
@@ -372,10 +373,10 @@ LRESULT DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             {
                 if (current_dialog == NULL) return 0;
 
-                char *f = strdup(current_dialog_out);
-                const char *name = strtok(f, "|");
-                const char *value = strtok(NULL, "|");
-                scpfile_add(current_file, name, atoi(value));
+                char *f = _strdup(current_dialog_out);
+                const char *name = strtok_s(f, "|", &f);
+                const char *value = strtok_s(NULL, "|", &f);
+                scpfile_add(pointer_to_current_file, name, atoi(value));
                 update_lists();
             }
             break;

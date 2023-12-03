@@ -7,6 +7,7 @@
 #define SCREEN_HEIGHT 695
 #define SCREEN_RES SCREEN_WIDTH*SCREEN_HEIGHT
 
-#define WINDOW_HEADER "Program v1.0"
+#define WINDOW_HEADER "Program"
+#define VERSION "1.0"
 
 #endif // DEFINES_H__

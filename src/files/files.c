@@ -51,9 +51,9 @@ void scpfile_clear(scpfile_t *scpfile)
 
 void scpfile_free(scpfile_t *scpfile)
 {
-    free(scpfile->key_names);
-    free(scpfile->key_values);
-    free(scpfile);
+    if (scpfile->key_names != NULL) free(scpfile->key_names);
+    if (scpfile->key_values != NULL) free(scpfile->key_values);
+    if (scpfile != NULL) free(scpfile);
 }
 
 size_t scpfile_save(scpfile_t *scpfile, const char *filename)
